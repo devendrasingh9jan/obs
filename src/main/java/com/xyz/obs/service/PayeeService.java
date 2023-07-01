@@ -6,6 +6,7 @@ import com.xyz.obs.model.Customer;
 import com.xyz.obs.model.Payee;
 import com.xyz.obs.model.Transfer;
 import com.xyz.obs.repository.*;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,19 +46,18 @@ public class PayeeService {
         }
     }
 
-    public String activatePayee(Long userId, Long accountId) {
-        Optional<Account> accountOptional = accountRepository.findById(accountId);
-        if (accountOptional.isPresent()) {
-            Account account = accountOptional.get();
-            Long customerPayeeId = account.getCustomer().getId();
+    public String activatePayee(Long userId, Long customerPayeeId) {
             Optional<Payee> payeeOptional = payeeRepository.findByCustomerIdAndCustomerPayeeId(userId, customerPayeeId);
-            payeeOptional.ifPresent( payee -> {
-                payee.setIsActive(true);
-                payeeRepository.save(payee);
-            });
+        if (payeeOptional.isPresent()) {
+            Payee payee = payeeOptional.get();
+            if(BooleanUtils.isTrue(payee.getIsActive())){
+                return "Payee Already Activated";
+            }
+            payee.setIsActive(true);
+            payeeRepository.save(payee);
             return "Payee Activated";
-        } else{
-            throw new ResourceNotFound("Account not found with AccountId:"+ accountId);
+        }else{
+            throw new ResourceNotFound("Please add Payee First.");
         }
     }
 
@@ -71,16 +71,14 @@ public class PayeeService {
         return payees;
     }
 
-    public String deletePayee(Long userId,Long accountId) {
-        Optional<Account> accountOptional = accountRepository.findById(accountId);
-        if (accountOptional.isPresent()) {
-            Account account = accountOptional.get();
-            Long customerPayeeId = account.getCustomer().getId();
-            Optional<Payee> payeeOptional = payeeRepository.findByCustomerIdAndCustomerPayeeId(userId, customerPayeeId);
-            payeeOptional.ifPresent(payeeRepository::delete);
+    public String deletePayee(Long userId,Long customerPayeeId) {
+        Optional<Payee> payeeOptional = payeeRepository.findByCustomerIdAndCustomerPayeeId(userId, customerPayeeId);
+        if (payeeOptional.isPresent()) {
+            Payee payee = payeeOptional.get();
+            payeeRepository.delete(payee);
             return "Payee Deleted";
         } else {
-            throw new ResourceNotFound("Account not found with AccountId:"+ accountId);
+            throw new ResourceNotFound("Add Payee to delete.");
         }
     }
 

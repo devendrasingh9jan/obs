@@ -157,7 +157,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa fa-user"></i></span>
                             </div>
-                            <input type="text" name='username' class="form-control" value="devendra.singh9jan98@gmail.com" placeholder="Email">
+                            <input type="text" name='username' class="form-control" value="vijendra.singh@gmail.com" placeholder="Email">
 
                         </div>
                         <div class="input-group form-group">

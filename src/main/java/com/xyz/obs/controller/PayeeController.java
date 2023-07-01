@@ -36,23 +36,37 @@ public class PayeeController {
 
     /**
      * User should know the payee account number or payee id to add.
-     * @param userId: loggedIn user or the user who wants to add payee
-     * @param accountId: account number of payee user wants to add
+     * userId: loggedIn user or the user who wants to add payee
+     * accountId: account number of payee user wants to add
      * @return Payee Added.
      */
-    @PostMapping(value = "/userId/{userId}/accountId/{accountId}")
-    public String addPayee(@PathVariable Long userId,@PathVariable Long accountId){
-        return payeeService.addPayee(userId,accountId);
+    @GetMapping(value = "/accountId")
+    public ResponseEntity<String> addPayee(@RequestParam Long accountId, HttpSession session, HttpServletResponse response) throws IOException {
+        User user = (User) session.getAttribute("user");
+        if (user != null) {
+            String status = payeeService.addPayee(user.getId(), accountId);
+            return ResponseEntity.ok(status);
+        } else {
+            response.sendRedirect("/login");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
     /**
      * User should know the payee account number or payee id to add.
-     * @param userId: loggedIn user or the user who wants to activate payee
-     * @param accountId: account number of payee user wants to activate
+     * userId: loggedIn user or the user who wants to activate payee
+     * @param payeeId: payeeId of payee user wants to activate
      * @return Payee Activated.
      */
-    @PostMapping(value = "/activate/userId/{userId}/accountId/{accountId}")
-    public String activatePayee(@PathVariable Long userId,@PathVariable Long accountId){
-        return payeeService.activatePayee(userId,accountId);
+    @GetMapping(value = "/activate")
+    public ResponseEntity<String> activatePayee(@RequestParam Long payeeId,HttpSession session, HttpServletResponse response) throws IOException {
+        User user = (User) session.getAttribute("user");
+        if (user != null) {
+            String status = payeeService.activatePayee(user.getId(), payeeId);
+            return ResponseEntity.ok(status);
+        } else {
+            response.sendRedirect("/login");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @GetMapping(value = "/")
@@ -69,13 +83,25 @@ public class PayeeController {
 
     /**
      * User should know the payee account number or payee id to add.
-     * @param userId: loggedIn user or the user who wants to activate payee
-     * @param accountId: account number of payee user wants to activate
+     * userId: loggedIn user or the user who wants to activate payee
+     * payeeId: account number of payee user wants to activate
      * @return Payee Deleted.
      */
-    @DeleteMapping(value = "/userId/{userId}/accountId/{accountId}")
+    /*@DeleteMapping(value = "/userId/{userId}/accountId/{accountId}")
     public String deletePayee(@PathVariable Long userId, @PathVariable Long accountId){
         return payeeService.deletePayee(userId,accountId);
+    }*/
+
+    @GetMapping(value = "/delete")
+    public ResponseEntity<String> deletePayee(@RequestParam Long payeeId,HttpSession session, HttpServletResponse response) throws IOException {
+        User user = (User) session.getAttribute("user");
+        if (user != null) {
+            String status = payeeService.deletePayee(user.getId(), payeeId);
+            return ResponseEntity.ok(status);
+        } else {
+            response.sendRedirect("/login");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
 

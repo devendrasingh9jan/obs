@@ -10,7 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFound.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ModelAndView handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ModelAndView handleIllegalArgumentException(ResourceNotFound ex) {
         ModelAndView modelAndView = new ModelAndView("error1");
         modelAndView.addObject("error", ex.getMessage());
         return modelAndView;

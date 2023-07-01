@@ -4,6 +4,7 @@ import com.xyz.obs.exception.ResourceNotFound;
 import com.xyz.obs.model.*;
 import com.xyz.obs.repository.*;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 @Service
 public class DepositService {
 
+    public static final String FIXED = "fixed";
+    public static final String RECURRING = "recurring";
     private final DepositRepository depositRepository;
     private final CustomerRepository customerRepository;
     private final AccountRepository accountRepository;
@@ -29,6 +32,28 @@ public class DepositService {
         this.customerRepository = customerRepository;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+    }
+
+    public String createDeposit(DepositRequest depositRequest) {
+        if (StringUtils.equals(depositRequest.getDepositType(), FIXED)){
+            FixedDeposit fixedDeposit = new FixedDeposit();
+            fixedDeposit.setCustId(depositRequest.getCustId());
+            fixedDeposit.setDepositType(depositRequest.getDepositType());
+            fixedDeposit.setPrincipal(depositRequest.getPrincipal());
+            fixedDeposit.setRate(depositRequest.getRate());
+            fixedDeposit.setYears(depositRequest.getYears());
+            return createFixedDeposit(fixedDeposit);
+        } else if (StringUtils.equals(depositRequest.getDepositType(), RECURRING)){
+            RecurringDeposit recurringDeposit = new RecurringDeposit();
+            recurringDeposit.setCustId(depositRequest.getCustId());
+            recurringDeposit.setDepositType(depositRequest.getDepositType());
+            recurringDeposit.setPrincipal(depositRequest.getPrincipal());
+            recurringDeposit.setRate(depositRequest.getRate());
+            recurringDeposit.setMonths(depositRequest.getMonths());
+            return createRecurringDeposit(recurringDeposit);
+        } else{
+            throw new ResourceNotFound("Wrong Deposit Type");
+        }
     }
 
     public String createFixedDeposit(FixedDeposit fixedDeposit) {

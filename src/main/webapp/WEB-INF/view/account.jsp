@@ -116,7 +116,6 @@
                 "</td><td>" +
                 transaction.transactionType +
                 "</td><td>" +
-                "</td><td>" +
                 transaction.date +
                 "</td><td>" +
                 transaction.amount +
