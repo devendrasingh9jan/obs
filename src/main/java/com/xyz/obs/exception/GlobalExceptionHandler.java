@@ -6,13 +6,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFound.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleResourceNotFoundException(ResourceNotFound ex, Model model) {
-        model.addAttribute("error", ex.getMessage());
-        return "redirect:/error1";
+    public RedirectView handleResourceNotFoundException(ResourceNotFound ex) {
+        RedirectView redirectView = new RedirectView("/error");
+        redirectView.addStaticAttribute("error", ex.getMessage());
+        return redirectView;
     }
 }

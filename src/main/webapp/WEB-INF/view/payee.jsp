@@ -110,6 +110,7 @@
                         alert(response);
                         location.reload(); // Refresh the page
                     }).fail(function(error) {
+                    //alert(error);
                         console.error("Error:", error);
                     });
                 });

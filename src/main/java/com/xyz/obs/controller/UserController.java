@@ -28,6 +28,11 @@ public class UserController {
         return "login";
     }
 
+    /*@GetMapping("error")
+    public String error(){
+        return "error";
+    }*/
+
     @GetMapping("login")
     String login() {
         return "login";
