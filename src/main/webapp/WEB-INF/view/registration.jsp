@@ -157,7 +157,7 @@ label {
             </div>
             <div class="form-group">
                 <label for="phone">Enter Phone</label>
-                <input type="text" name="phone" id="phone" placeholder="Phone" required="required" />
+                <input type="text" name="phone" id="phone" placeholder="Phone" minlength="10" maxlength="10"required="required" />
             </div>
 			<div class="form-group">
 				<label for="password">Enter Password</label>

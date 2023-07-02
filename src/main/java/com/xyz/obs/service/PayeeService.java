@@ -35,6 +35,10 @@ public class PayeeService {
         Optional<Account> accountOptional = accountRepository.findById(accountId);
         if (accountOptional.isPresent()) {
             Account account = accountOptional.get();
+            Optional<Payee> addedPayeeOptional = payeeRepository.findByCustomerIdAndCustomerPayeeId(userId, account.getCustomer().getId());
+            if (addedPayeeOptional.isPresent()) {
+                throw new ResourceNotFound("Payee is already added with the  AccountId:"+ accountId);
+            }
             Payee payee = new Payee();
             payee.setCustomerId(userId);
             payee.setCustomerPayeeId(account.getCustomer().getId());
