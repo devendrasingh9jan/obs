@@ -40,7 +40,7 @@ public class DepositService {
             fixedDeposit.setCustId(depositRequest.getCustId());
             fixedDeposit.setDepositType(depositRequest.getDepositType());
             fixedDeposit.setPrincipal(depositRequest.getPrincipal());
-            fixedDeposit.setRate(depositRequest.getRate());
+            fixedDeposit.setRate(6.00);
             fixedDeposit.setYears(depositRequest.getYears());
             return createFixedDeposit(fixedDeposit);
         } else if (StringUtils.equals(depositRequest.getDepositType(), RECURRING)){
@@ -48,7 +48,7 @@ public class DepositService {
             recurringDeposit.setCustId(depositRequest.getCustId());
             recurringDeposit.setDepositType(depositRequest.getDepositType());
             recurringDeposit.setPrincipal(depositRequest.getPrincipal());
-            recurringDeposit.setRate(depositRequest.getRate());
+            recurringDeposit.setRate(6.00);
             recurringDeposit.setMonths(depositRequest.getMonths());
             return createRecurringDeposit(recurringDeposit);
         } else{
@@ -56,7 +56,7 @@ public class DepositService {
         }
     }
 
-    public String createFixedDeposit(FixedDeposit fixedDeposit) {
+    private String createFixedDeposit(FixedDeposit fixedDeposit) {
         Optional<Customer> customerOptional = customerRepository.findByUserId(fixedDeposit.getCustId());
         if(customerOptional.isPresent()){
             Customer customer = customerOptional.get();
@@ -88,7 +88,7 @@ public class DepositService {
         }
     }
 
-    public String createRecurringDeposit(RecurringDeposit recurringDeposit) {
+    private String createRecurringDeposit(RecurringDeposit recurringDeposit) {
         Optional<Customer> customerOptional = customerRepository.findByUserId(recurringDeposit.getCustId());
         if(customerOptional.isPresent()){
             Customer customer = customerOptional.get();
@@ -120,8 +120,18 @@ public class DepositService {
         }
     }
 
-    public List<DepositView> getAllDeposits(Long userId) {
-        return depositRepository.findAllByCustomerId(userId);
+    public List<Deposit> getAllDeposits(Long userId) {
+        return depositRepository.findByCustomerId(userId);
+    }
+
+    public String close(Long userId, Long depositId, String depositType) {
+        if (StringUtils.equals(depositType, FIXED)){
+            return closeFixedDeposit(userId, depositId);
+        } else if (StringUtils.equals(depositType, RECURRING)){
+            return closeRecurringDeposit(userId, depositId);
+        } else{
+            throw new ResourceNotFound("Wrong Deposit Type");
+        }
     }
 
 
@@ -135,62 +145,71 @@ public class DepositService {
      * r is the rate of interest per period
      * t is the tenure
      */
-    public String closeFixedDeposit(FixedDeposit fixedDepositRequest) {
-        List<Deposit> deposits = depositRepository.findByCustomerId(fixedDepositRequest.getCustId()).stream().filter(e -> e.getDepositType().equals("fixed")).collect(Collectors.toList());
-        Optional<Account> accountOptional = accountRepository.findByCustomerId(fixedDepositRequest.getCustId());
-        for (Deposit deposit : deposits) {
-            if(Objects.nonNull(fixedDepositRequest.getDepositId()) && deposit.getId().equals(fixedDepositRequest.getDepositId())
-                && deposit instanceof FixedDeposit && accountOptional.isPresent()  && BooleanUtils.isTrue(deposit.getIsActive())){
-                FixedDeposit fixedDeposit = (FixedDeposit) deposit;
-                Integer compoundingFrequency = 1; // Compounded annually
-                Double maturityAmount = fixedDeposit.getPrincipal() * Math.pow(1 + (fixedDeposit.getRate() / compoundingFrequency), (compoundingFrequency * fixedDeposit.getYears()));;
-                Account account = accountOptional.get();
-                Double updatedBalance = account.getBalance() + maturityAmount;
-                fixedDeposit.setIsActive(false);
-                account.setBalance(updatedBalance);
-                Transaction transactionCustomer = new Transaction();
-                transactionCustomer.setDate(new Date());
-                transactionCustomer.setTransactionType("Credit");
-                transactionCustomer.setAmount(maturityAmount);
-                transactionCustomer.setAccount(account);
-                transactionRepository.save(transactionCustomer);
-                accountRepository.save(account);
-                depositRepository.save(fixedDeposit);
-                return "closed";
-            } else{
-                throw new ResourceNotFound("Getting error in closing Fixed Deposit.");
+    private String closeFixedDeposit(Long userId, Long depositId) {
+        Optional<Customer> customerOptional = customerRepository.findByUserId(userId);
+        if(customerOptional.isPresent()) {
+            Customer customer = customerOptional.get();
+            List<Deposit> deposits = depositRepository.findByCustomerId(customer.getId()).stream().filter(e -> e.getDepositType().equals("fixed") && e.getId().compareTo(depositId)==0).collect(Collectors.toList());
+            Optional<Account> accountOptional = accountRepository.findByCustomerId(customer.getId());
+            for (Deposit deposit : deposits) {
+                if (Objects.nonNull(depositId) && deposit.getId().equals(depositId)
+                        && deposit instanceof FixedDeposit && accountOptional.isPresent() && BooleanUtils.isTrue(deposit.getIsActive())) {
+                    FixedDeposit fixedDeposit = (FixedDeposit) deposit;
+                    Integer compoundingFrequency = 1; // Compounded annually
+                    Double maturityAmount = fixedDeposit.getPrincipal() * Math.pow(1 + (fixedDeposit.getRate() / compoundingFrequency), (compoundingFrequency * fixedDeposit.getYears()));
+                    ;
+                    Account account = accountOptional.get();
+                    Double updatedBalance = account.getBalance() + maturityAmount;
+                    fixedDeposit.setIsActive(false);
+                    account.setBalance(updatedBalance);
+                    Transaction transactionCustomer = new Transaction();
+                    transactionCustomer.setDate(new Date());
+                    transactionCustomer.setTransactionType("Credit");
+                    transactionCustomer.setAmount(maturityAmount);
+                    transactionCustomer.setAccount(account);
+                    transactionRepository.save(transactionCustomer);
+                    accountRepository.save(account);
+                    depositRepository.save(fixedDeposit);
+                    return "Deposit closed";
+                } else {
+                    return "Fixed Deposit already closed.";
+                }
             }
         }
-        return "not closed";
+        return "Deposit not closed";
     }
 
-    public String closeRecurringDeposit(RecurringDeposit recurringDepositRequest) {
-        List<Deposit> deposits = depositRepository.findByCustomerId(recurringDepositRequest.getCustId()).stream().filter(e -> e.getDepositType().equals("recurring")).collect(Collectors.toList());
-        Optional<Account> accountOptional = accountRepository.findByCustomerId(recurringDepositRequest.getCustId());
-        for (Deposit deposit : deposits) {
-            if(Objects.nonNull(recurringDepositRequest.getDepositId()) && deposit.getId().equals(recurringDepositRequest.getDepositId())
-                    && deposit instanceof RecurringDeposit && accountOptional.isPresent() && BooleanUtils.isTrue(deposit.getIsActive())){
-                RecurringDeposit recurringDeposit = (RecurringDeposit) deposit;
-                Integer compoundingFrequency = 1; // Compounded annually
-                Double maturityAmount = calculateMaturityAmount(recurringDeposit.getPrincipal(), recurringDeposit.getRate(), compoundingFrequency, recurringDeposit.getMonths());
-                Account account = accountOptional.get();
-                Double updatedBalance = account.getBalance() + maturityAmount;
-                recurringDeposit.setIsActive(false);
-                account.setBalance(updatedBalance);
-                Transaction transactionCustomer = new Transaction();
-                transactionCustomer.setDate(new Date());
-                transactionCustomer.setTransactionType("Credit");
-                transactionCustomer.setAmount(maturityAmount);
-                transactionCustomer.setAccount(account);
-                transactionRepository.save(transactionCustomer);
-                accountRepository.save(account);
-                depositRepository.save(recurringDeposit);
-                return "closed";
-            } else{
-                throw new ResourceNotFound("Getting error in closing Recurring Deposit.");
+    private String closeRecurringDeposit(Long userId, Long depositId) {
+        Optional<Customer> customerOptional = customerRepository.findByUserId(userId);
+        if(customerOptional.isPresent()) {
+            Customer customer = customerOptional.get();
+            List<Deposit> deposits = depositRepository.findByCustomerId(customer.getId()).stream().filter(e -> e.getDepositType().equals("recurring") && e.getId().compareTo(depositId)==0).collect(Collectors.toList());
+            Optional<Account> accountOptional = accountRepository.findByCustomerId(customer.getId());
+            for (Deposit deposit : deposits) {
+                if (Objects.nonNull(depositId) && deposit.getId().equals(depositId)
+                        && deposit instanceof RecurringDeposit && accountOptional.isPresent() && BooleanUtils.isTrue(deposit.getIsActive())) {
+                    RecurringDeposit recurringDeposit = (RecurringDeposit) deposit;
+                    Integer compoundingFrequency = 1; // Compounded annually
+                    Double maturityAmount = calculateMaturityAmount(recurringDeposit.getPrincipal(), recurringDeposit.getRate(), compoundingFrequency, recurringDeposit.getMonths());
+                    Account account = accountOptional.get();
+                    Double updatedBalance = account.getBalance() + maturityAmount;
+                    recurringDeposit.setIsActive(false);
+                    account.setBalance(updatedBalance);
+                    Transaction transactionCustomer = new Transaction();
+                    transactionCustomer.setDate(new Date());
+                    transactionCustomer.setTransactionType("Credit");
+                    transactionCustomer.setAmount(maturityAmount);
+                    transactionCustomer.setAccount(account);
+                    transactionRepository.save(transactionCustomer);
+                    accountRepository.save(account);
+                    depositRepository.save(recurringDeposit);
+                    return "Deposit closed";
+                } else {
+                    return "Fixed Recurring Deposit already closed.";
+                }
             }
         }
-        return "not closed";
+        return "Deposit not closed";
     }
 
     private static double calculateMaturityAmount(double monthlyDeposit, double interestRate, Integer compoundingFrequency, int tenureMonths) {

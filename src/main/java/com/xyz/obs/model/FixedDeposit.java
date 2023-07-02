@@ -18,4 +18,6 @@ public class FixedDeposit extends Deposit {
 
     //In Years
     private Integer years;
+
+    Long months = null;
 }

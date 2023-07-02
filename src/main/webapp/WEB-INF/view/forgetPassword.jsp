@@ -78,8 +78,8 @@
 </nav>
 
 <div class="container">
-    <h2>Forgot Password?</h2>
-    <p><b>You can reset your password here.</b></p>
+    <h2>Change Password?</h2>
+    <p><b>You can change your password here.</b></p>
     <div class="panel-body">
         <form id="forget-form" role="form" autocomplete="off" class="form" method="post" action="forgetPassword/user"
               modelAttribute="user">

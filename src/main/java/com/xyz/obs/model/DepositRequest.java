@@ -14,7 +14,7 @@ import javax.persistence.Transient;
 public class DepositRequest {
     private String depositType;
 
-    private Double rate;
+    //private Double rate;
 
     private Long principal;
 

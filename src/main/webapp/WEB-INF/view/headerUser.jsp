@@ -38,11 +38,6 @@
                 </li>
 
                 <li class="nav-item">
-                   <a href="/transfer/"
-                      class="nav-link text-light">Transfer</a>
-                </li>
-
-                <li class="nav-item">
                     <a class="nav-link text-light " href="/profile">${firstname}</a>
                 </li>
 

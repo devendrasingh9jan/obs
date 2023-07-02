@@ -19,4 +19,6 @@ public class RecurringDeposit extends Deposit {
     //In Years
     private Integer months;
 
+    Long years = null;
+
 }

@@ -22,7 +22,7 @@
         background-size: cover;
         background-color: #f8f8f8; /* Changed background color */
         font-family: Arial, sans-serif; /* Added font-family */
-        background-image: url("");
+        background-image: url("https://www.universityliving.com/blog/wp-content/uploads/2019/10/UK-Bank.png");
         background-size: cover;
         background-repeat: no-repeat;
     }
@@ -157,14 +157,14 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa fa-user"></i></span>
                             </div>
-                            <input type="text" name='username' class="form-control" value="vijendra.singh@gmail.com" placeholder="Email">
+                            <input type="text" name='username' class="form-control" placeholder="Email">
 
                         </div>
                         <div class="input-group form-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa fa-key"></i></span>
                             </div>
-                            <input type="password" name='password'class="form-control" value= "12345678" placeholder="Password">
+                            <input type="password" name='password'class="form-control" placeholder="Password">
                         </div>
                         <div class="form-group">
                             <input type="submit" value="Log In" name="submit" class="btn float-right login_btn" />
@@ -174,7 +174,7 @@
                                 <a href="/registration" style="text-decoration:none"><b>Sign Up</b></a>
                             </div>
                             <div class="links">
-                                <a href="/forgetPassword" style="text-decoration:none"><b>Forgot your password?</b></a>
+                                <a href="/forgetPassword" style="text-decoration:none"><b>Change your password?</b></a>
                             </div>
                         </div>
                     </form>

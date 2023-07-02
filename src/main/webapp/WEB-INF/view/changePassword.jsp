@@ -58,7 +58,7 @@
             <div class="form-group">
               <label for="password1"><b>Old Password</b></label>
               <input type="password" value="" class="form-control" required="required" name="password_old" id="password_old"
-               minlength="8" placeholder="New Password">
+               minlength="8" placeholder="Old Password">
             </div>
             <div class="form-group">
               <label for="password1"><b>New Password</b></label>

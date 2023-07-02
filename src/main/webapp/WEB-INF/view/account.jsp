@@ -18,7 +18,7 @@
             margin-top: 50px;
         }
       	body{
-      		background-image: url("https://cdn.pixabay.com/photo/2021/01/05/06/40/boat-5889919_1280.png");
+      		background-image: url("https://www.revenued.com/wp-content/uploads/2021/05/ACCOUNT-MAIN-01-1024x512.jpg");
         	background-size: cover;
         	background-repeat: no-repeat;
       	}

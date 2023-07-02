@@ -5,4 +5,6 @@ public interface DepositView {
     String getDepositType();
     Long getPrincipal();
     Double getRate();
+
 }
+

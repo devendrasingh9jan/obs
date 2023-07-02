@@ -16,8 +16,10 @@
     <style>
     
     body{
-      		background-image: url("https://cdn.pixabay.com/photo/2020/03/01/00/55/compass-4891499_1280.jpg");
+      		background-image: url("https://emea.exelatech.com/sites/default/files/exela-blogs/LP%20Image.png");
         	background-size: cover;
+        	width: 100vw;
+            height: 100vh;
         	background-repeat: no-repeat;
       	}
     
